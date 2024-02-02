@@ -54,6 +54,18 @@ defmodule Elang.Adapter.Manticore do
     post(client, "/bulk", payload)
   end
 
+  @spec insert(binary() | Tesla.Client.t(), any(), map()) ::
+          {:error, any()} | {:ok, Tesla.Env.t()}
+  def insert(url, doc, data) when is_binary(url) do
+    client(url) |> insert(doc, data)
+  end
+
+  def insert(client, doc, data) do
+    data = data |> Map.merge(%{index: doc})
+    payload = build_item(doc, data)
+    post(client, "/insert", payload)
+  end
+
   def build_bulk_item(doc, action, data, id \\ nil) do
     action_payload = if id do
       %{index: doc, doc: data}
@@ -62,6 +74,9 @@ defmodule Elang.Adapter.Manticore do
     end
     %{"#{action}": action_payload}
   end
+
+  def build_item(doc, data), do: %{index: doc, doc: data}
+  def build_item(doc, id, data), do: %{index: doc, id: id, doc: data}
 
   @spec client(any) :: Tesla.Client.t()
   def client(url) do
