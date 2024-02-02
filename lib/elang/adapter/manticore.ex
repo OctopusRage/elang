@@ -45,6 +45,24 @@ defmodule Elang.Adapter.Manticore do
     post(client, "/search", payload)
   end
 
+  @spec bulk(binary() | Tesla.Client.t(), any()) :: {:error, any()} | {:ok, Tesla.Env.t()}
+  def bulk(url, payload) when is_binary(url) do
+    client(url) |> bulk(payload)
+  end
+
+  def bulk(client, payload) do
+    post(client, "/bulk", payload)
+  end
+
+  def build_bulk_item(doc, action, data, id \\ nil) do
+    action_payload = if id do
+      %{index: doc, doc: data}
+    else
+      %{index: doc, doc: data, id: id}
+    end
+    %{"#{action}": action_payload}
+  end
+
   @spec client(any) :: Tesla.Client.t()
   def client(url) do
     middleware = [

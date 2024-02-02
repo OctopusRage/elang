@@ -1,6 +1,7 @@
 defmodule Elang.Adapter.Elastic do
   use Tesla
   @behaviour Elang.Adapter.Base
+  plug(Tesla.Middleware.JSON)
   adapter(Tesla.Adapter.Gun)
 
   @spec doc(binary | Tesla.Client.t(), any, any) :: {:error, any} | {:ok, Tesla.Env.t()}
@@ -29,6 +30,24 @@ defmodule Elang.Adapter.Elastic do
 
   def search(client, doc, payload) do
     post(client, "/#{doc}/search", payload)
+  end
+
+  @spec bulk(binary() | Tesla.Client.t(), any()) :: {:error, any()} | {:ok, Tesla.Env.t()}
+  def bulk(url, payload) when is_binary(url) do
+    client(url) |> bulk(payload)
+  end
+
+  def bulk(client, payload) do
+    post(client, "/_bulk", payload)
+  end
+
+  def build_bulk_item(doc, action, data, id \\ nil) do
+    action_payload = if id do
+      %{index: doc, doc: data}
+    else
+      %{index: doc, doc: data, id: id}
+    end
+    %{"#{action}": action_payload}
   end
 
   @spec client(any) :: Tesla.Client.t()
