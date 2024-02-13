@@ -1,4 +1,5 @@
 defmodule Y do
+  alias Elang.Adapter.Manticore
   def test do
     Z.insert("ax", %{
       name: "aji",
@@ -11,6 +12,23 @@ defmodule Y do
       user_id: "089577683131",
       app_id: 1
     })
+  end
+
+  def test_bulk do
+    [Manticore.build_bulk_item("ax", "replace", %{
+      name: "tirta",
+      user_id: "089577683131",
+      app_id: 1
+    }, 13), Manticore.build_bulk_item("ax", "replace", %{
+      name: "tirta",
+      user_id: "089577683131",
+      app_id: 1
+    }, 13),
+    Manticore.build_bulk_item("ax", "replace", %{
+      name: "tirta",
+      user_id: "089577683131",
+      app_id: 1
+    }, 13)] |> Manticore.collect_bulk_items() |> Z.bulk()
   end
 
   def search do

@@ -40,6 +40,14 @@ defmodule Elang do
       def insert(x, doc, data) do
         adapter().insert(x, doc, data)
       end
+
+      def bulk(payload) do
+        if url = base_url(), do: bulk(url, payload), else: raise "url not set"
+      end
+
+      def bulk(x, payload) do
+        adapter().bulk(x, payload)
+      end
     end
 
 

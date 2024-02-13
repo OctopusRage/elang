@@ -2,7 +2,6 @@ defmodule Elang.Adapter.Manticore do
   use Tesla
   @behaviour Elang.Adapter.Base
   plug(Tesla.Middleware.JSON)
-  plug(Tesla.Middleware.Headers, [{"content-type", "application/x-ndjson"}])
   adapter(Tesla.Adapter.Gun)
 
   @spec doc(binary | Tesla.Client.t(), any, any) :: {:error, any} | {:ok, Tesla.Env.t()}
@@ -47,7 +46,7 @@ defmodule Elang.Adapter.Manticore do
 
   @spec bulk(binary() | Tesla.Client.t(), any()) :: {:error, any()} | {:ok, Tesla.Env.t()}
   def bulk(url, payload) when is_binary(url) do
-    client(url) |> bulk(payload)
+    client_ndjson(url) |> bulk(payload)
   end
 
   def bulk(client, payload) do
@@ -68,11 +67,15 @@ defmodule Elang.Adapter.Manticore do
 
   def build_bulk_item(doc, action, data, id \\ nil) do
     action_payload = if id do
-      %{index: doc, doc: data}
-    else
       %{index: doc, doc: data, id: id}
+    else
+      %{index: doc, doc: data}
     end
-    %{"#{action}": action_payload}
+    %{"#{action}": action_payload} |> Jason.encode!()
+  end
+
+  def collect_bulk_items(items) do
+    Enum.join(items, "\n")
   end
 
   def build_item(doc, data), do: %{index: doc, doc: data}
@@ -83,6 +86,15 @@ defmodule Elang.Adapter.Manticore do
     middleware = [
       {Tesla.Middleware.BaseUrl, url},
       Tesla.Middleware.JSON
+    ]
+
+    Tesla.client(middleware)
+  end
+
+  def client_ndjson(url) do
+    middleware = [
+      {Tesla.Middleware.BaseUrl, url},
+      {Tesla.Middleware.Headers, [{"content-type", "application/x-ndjson"}]}
     ]
 
     Tesla.client(middleware)
