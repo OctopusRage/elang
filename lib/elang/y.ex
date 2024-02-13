@@ -5,6 +5,7 @@ defmodule Y do
       user_id: "089577682431",
       app_id: 1
     })
+
     Z.insert("ax", %{
       name: "tirta",
       user_id: "089577683131",
@@ -13,6 +14,6 @@ defmodule Y do
   end
 
   def search do
-    Z.search("ax", %{query: %{query_string: "@name tirta AND @user_id 089577683131"}})
+    Z.search("ax", %{query: %{match: %{"name,user_id": %{query: "tirta", operator: "or"}}}})
   end
 end
