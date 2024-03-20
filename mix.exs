@@ -21,7 +21,7 @@ defmodule Elang.MixProject do
   defp deps do
     [
       {:tesla, "~> 1.6"},
-      {:gun, "~> 2.0"},
+      {:hackney, "~> 1.13"},
       {:idna, "~> 6.1"},
       {:jason, "~> 1.0"}
       # {:dep_from_hexpm, "~> 0.3.0"},

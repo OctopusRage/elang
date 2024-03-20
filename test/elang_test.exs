@@ -29,6 +29,7 @@ defmodule ElangTest do
       user_id: "089577683131",
       app_id: 1
     }, 13)] |> Manticore.collect_bulk_items() |> McAdapterTest.bulk()
+    IO.inspect(records)
     assert {:ok, _} = records
     # IO.inspect(r)
   end

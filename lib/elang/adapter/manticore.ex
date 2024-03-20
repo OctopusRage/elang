@@ -2,7 +2,7 @@ defmodule Elang.Adapter.Manticore do
   use Tesla
   @behaviour Elang.Adapter.Base
   plug(Tesla.Middleware.JSON)
-  adapter(Tesla.Adapter.Gun)
+  adapter(Tesla.Adapter.Hackney)
 
   @spec doc(binary | Tesla.Client.t(), any, any) :: {:error, any} | {:ok, Tesla.Env.t()}
   def doc(url, doc, id) when is_binary(url) do
